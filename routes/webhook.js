@@ -71,7 +71,6 @@ function handleTaikin(event) {
   console.log(""+hour+"時");
   let userId = event.source.userId;
   let dragon = getDragon(hour);
-  console.log(userId);
   if (dragon == '') {
       var text = '';
       if (hour < 10) {

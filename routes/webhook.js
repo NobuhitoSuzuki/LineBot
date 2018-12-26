@@ -19,6 +19,10 @@ const WHITE = "cm3smzosvd53k6a/IMG_1466.JPG";
 const ULTIMATE_WHITE = "1hi0bpoooot1cd5/IMG_1469.JPG";
 const FOUR_NINE = "4fcvv80qmbf89ub/61pYZyjEfzL._SY445_.jpg";
 const AKIYAMA_DONO = "zapswsy4gociqbk/Akiyamadono.png";
+
+const NB_LINE_ID = process.env.MY_LINE_ID;
+const MN_LINE_ID = process.env.MONCHI_LINE_ID;
+
 var isPrevShowAkiyamadono = false;
 // create LINE SDK config from env variables
 const config = {
@@ -83,14 +87,14 @@ function handleTaikin(event) {
           text : text
       });
   }
-  if (userId == "Uf3000ec33f345bf533bcb9c9147e7624") {
+  if (userId == NB_LINE_ID) {
     let url = DB_TMP_DOMAIN + FOUR_NINE;
     return client.replyMessage(event.replyToken,
         [
             {type: 'text', 'text' : 'お疲れ様でございます。ご主人様。'}, 
             {type: 'image', originalContentUrl : url, previewImageUrl : url}
         ]);
-  } else if (userId == "UU19ab59de7355c1cffc3fee2c79767927") {
+  } else if (userId == MN_LINE_ID) {
         if (isPrevShowAkiyamadono) {
             isPrevShowAkiyamadono = false;
             return client.replyMessage(event.replyToken, 

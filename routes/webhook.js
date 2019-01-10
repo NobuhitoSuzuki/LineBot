@@ -23,19 +23,19 @@ const AKIYAMA_DONO = "zapswsy4gociqbk/Akiyamadono.png";
 const NB_LINE_ID = process.env.MY_LINE_ID;
 const MN_LINE_ID = process.env.MONCHI_LINE_ID;
 
-var isPrevShowAkiyamadono = false;
 // create LINE SDK config from env variables
 const config = {
-  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
-  channelSecret: process.env.CHANNEL_SECRET
+    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+    channelSecret: process.env.CHANNEL_SECRET
 };
 router.post('/', (req, res, next) => {
     Promise
-      .all(req.body.events.map(handleEvent))
-      .then((result) => res.json(result));
+        .all(req.body.events.map(handleEvent))
+        .then((result) => res.json(result));
 });
 
 const client = new line.Client(config);
+
 function handleEvent(event) {
     if (event.type == EVEMT_TYPE_POSTBACK) {
         return Promise.resolve(null);
@@ -54,75 +54,67 @@ function handleEvent(event) {
     }
 }
 
-function showKusoUkareChinouZero (event) {
+function showKusoUkareChinouZero(event) {
     return client.replyMessage(event.replyToken,
         [
             {
                 type: 'image',
-                originalContentUrl : "https://dl.dropboxusercontent.com/s/he2dnnb7ysg1zq0/9073161319800.jpg",
-                previewImageUrl : "https://dl.dropboxusercontent.com/s/he2dnnb7ysg1zq0/9073161319800.jpg"
+                originalContentUrl: "https://dl.dropboxusercontent.com/s/he2dnnb7ysg1zq0/9073161319800.jpg",
+                previewImageUrl: "https://dl.dropboxusercontent.com/s/he2dnnb7ysg1zq0/9073161319800.jpg"
             }
         ]);
 }
 
 // たいきんメッセージのハンドリング
 function handleTaikin(event) {
-  if (event.message.text != MESSAGE_TAIKIN) {
-      // たいきん以外処理しない
-      return Promise.resolve(null);
-  }
-  let hour = getHour();
-  console.log(""+hour+"時");
-  let userId = event.source.userId;
-  let dragon = getDragon(hour);
-  if (dragon == '') {
-      var text = '';
-      if (hour < 10) {
-          text = '夜勤か何か？';
-      } else {
-          text = '草。働け。';
-      }
-      return client.replyMessage(event.replyToken, {
-          type : 'text',
-          text : text
-      });
-  }
-  if (userId == NB_LINE_ID) {
-    let url = DB_TMP_DOMAIN + FOUR_NINE;
-    return client.replyMessage(event.replyToken,
-        [
-            {type: 'text', 'text' : 'お疲れ様でございます。ご主人様。'}, 
-            {type: 'image', originalContentUrl : url, previewImageUrl : url}
-        ]);
-  } else if (userId == MN_LINE_ID) {
-        if (isPrevShowAkiyamadono) {
-            isPrevShowAkiyamadono = false;
-            return client.replyMessage(event.replyToken, 
-            [
-                 {type: 'image', originalContentUrl : dragon, previewImageUrl : dragon}
-            ]);
-       }    
-      if (shouldShowAkiyamadono()) {
-        isPrevShowAkiyamadono = true;
-        let url = DB_TMP_DOMAIN + AKIYAMA_DONO;
+    if (event.message.text != MESSAGE_TAIKIN) {
+        // たいきん以外処理しない
+        return Promise.resolve(null);
+    }
+    let hour = getHour();
+    console.log("" + hour + "時");
+    let userId = event.source.userId;
+    let dragon = getDragon(hour);
+    if (dragon == '') {
+        var text = '';
+        if (hour < 10) {
+            text = '夜勤か何か？';
+        } else {
+            text = '草。働け。';
+        }
+        return client.replyMessage(event.replyToken, {
+            type: 'text',
+            text: text
+        });
+    }
+    if (userId == NB_LINE_ID) {
+        let url = DB_TMP_DOMAIN + FOUR_NINE;
         return client.replyMessage(event.replyToken,
             [
-                {type: 'text', 'text' : '了解しました!秋山殿。'}, 
-                {type: 'image', originalContentUrl : url, previewImageUrl : url}
+                { type: 'text', 'text': 'お疲れ様でございます。ご主人様。' },
+                { type: 'image', originalContentUrl: url, previewImageUrl: url }
             ]);
-      } else {
-        return client.replyMessage(event.replyToken, 
+    } else if (userId == MN_LINE_ID) {
+        if (shouldShowAkiyamadono()) {
+            let url = DB_TMP_DOMAIN + AKIYAMA_DONO;
+            return client.replyMessage(event.replyToken,
+                [
+                    { type: 'text', 'text': '了解しました!秋山殿。' },
+                    { type: 'image', originalContentUrl: url, previewImageUrl: url }
+                ]);
+        } else {
+            return client.replyMessage(event.replyToken,
+                [
+                    { type: 'image', originalContentUrl: dragon, previewImageUrl: dragon }
+                ]);
+        }
+    } else {
+        return client.replyMessage(event.replyToken,
             [
-                 {type: 'image', originalContentUrl : dragon, previewImageUrl : dragon}
+                { type: 'image', originalContentUrl: dragon, previewImageUrl: dragon }
             ]);
-      }
-  } else {
-    return client.replyMessage(event.replyToken, 
-        [
-             {type: 'image', originalContentUrl : dragon, previewImageUrl : dragon}
-        ]);
-  }
-  return Promise.resolve(null);
+    }
+    return Promise.resolve(null);
 }
 // ドラゴンを返す
 function getDragon(hour) {
@@ -143,7 +135,7 @@ function getDragon(hour) {
 // 秋山殿出す？
 function shouldShowAkiyamadono() {
     let min = 1;
-    let max = 5;
+    let max = 6;
     var r = Math.floor(Math.random() * (max + 1 - min)) + min;
     return r == 3;
 }

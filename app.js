@@ -32,4 +32,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-module.exports = app;
+(process.env.NOW_REGION) ? module.exports = app : app.listen(PORT);
+console.log(`Server running at ${PORT}`);

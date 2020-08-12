@@ -1,8 +1,13 @@
-Skip to content
+'use strict';
+
 var express = require('express');
 const line = require('@line/bot-sdk');
 const moment = require('moment-timezone');
+
 require('dotenv').config();
+
+const env = process.env
+
 const EVENT_TYPE_MESSAGE = "message";
 const EVEMT_TYPE_POSTBACK = "postback";
 const MESSAGE_TYPE_TEXT = 'text';
@@ -22,20 +27,9 @@ const NB_LINE_ID = process.env.MY_LINE_ID;
 const MN_LINE_ID = process.env.MONCHI_LINE_ID;
 const PORT = process.env.PORT || 3000;
 
-const admin = require('firebase-admin');
-var serviceAccount = require("./lstrage-firebase-adminsdk-ujpw7-35db9869dc.json");
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://lstrage.firebaseio.com"
-});
-var db = admin.firestore();
-let settings = { timestampsInSnapshots: true };
-db.settings(settings);
-var FieldValue = require('firebase-admin').firestore.FieldValue;
-// create LINE SDK config from env variables
 const config = {
-    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
-    channelSecret: process.env.CHANNEL_SECRET
+    channelAccessToken: env.CHANNEL_ACCESS_TOKEN,
+    channelSecret: env.CHANNEL_SECRET
 };
 
 var app = express();
@@ -94,51 +88,52 @@ function handleTaikin(event) {
             text: text
         });
     }
-    if (userId == NB_LINE_ID) {
-        if (admin != null) {
-            var attendanceRef = db.collection('attendances')
-                .where("line_id", "==", userId)
-                .orderBy("leaved_at", "desc")
-                .limit(1);
-            attendanceRef.get().then(snapshot => {
-                if (snapshot.size != 0) {
-                    snapshot.forEach(doc => {
-                        if (isAlreadyLeaved(doc.data().leaved_at.toDate())) {
-                            return client.replyMessage(event.replyToken,
-                                [
-                                    { type: 'text', 'text': "あなた、もうたいきんしてますね。" }
-                                ]);
-                        } else {
-                            registerLeavingDate(userId);
-                            let result = comparePreviousLeavedDateToTodayLeaveDate(doc.data().leaved_at.toDate());
-                            if (result == 1) {
-                                return client.replyMessage(event.replyToken,
-                                    [
-                                        { type: 'text', 'text': 'お疲れ様でございます。前回よりたいきんより遅いっすねw' }
-                                    ]);
-                            } else if (result == 0) {
-                                return client.replyMessage(event.replyToken,
-                                    [
-                                        { type: 'text', 'text': 'お疲れ様でございます。前回と同じくらいの時間にたいきんできましたね。' }                                    ]);
-                            } else {
-                                return client.replyMessage(event.replyToken,
-                                    [
-                                        { type: 'text', 'text': 'お疲れ様でございます。前回よりたいきん早いっすねw' }
-                                    ]);
-                            }
-                        }
-                    });
-                } else {
-                    registerLeavingDate(userId);
-                    return getDefaultMessage(event);
-                }
-            }).catch(err => {
-                console.log('Error getting documents', err);
-                registerLeavingDate(userId);
-                return getDefaultMessage(event);
-            });
-        }
-    } else if (userId == MN_LINE_ID) {
+//     if (userId == NB_LINE_ID) {
+//         if (admin != null) {
+//             var attendanceRef = db.collection('attendances')
+//                 .where("line_id", "==", userId)
+//                 .orderBy("leaved_at", "desc")
+//                 .limit(1);
+//             attendanceRef.get().then(snapshot => {
+//                 if (snapshot.size != 0) {
+//                     snapshot.forEach(doc => {
+//                         if (isAlreadyLeaved(doc.data().leaved_at.toDate())) {
+//                             return client.replyMessage(event.replyToken,
+//                                 [
+//                                     { type: 'text', 'text': "あなた、もうたいきんしてますね。" }
+//                                 ]);
+//                         } else {
+//                             registerLeavingDate(userId);
+//                             let result = comparePreviousLeavedDateToTodayLeaveDate(doc.data().leaved_at.toDate());
+//                             if (result == 1) {
+//                                 return client.replyMessage(event.replyToken,
+//                                     [
+//                                         { type: 'text', 'text': 'お疲れ様でございます。前回よりたいきんより遅いっすねw' }
+//                                     ]);
+//                             } else if (result == 0) {
+//                                 return client.replyMessage(event.replyToken,
+//                                     [
+//                                         { type: 'text', 'text': 'お疲れ様でございます。前回と同じくらいの時間にたいきんできましたね。' }                                    ]);
+//                             } else {
+//                                 return client.replyMessage(event.replyToken,
+//                                     [
+//                                         { type: 'text', 'text': 'お疲れ様でございます。前回よりたいきん早いっすねw' }
+//                                     ]);
+//                             }
+//                         }
+//                     });
+//                 } else {
+//                     registerLeavingDate(userId);
+//                     return getDefaultMessage(event);
+//                 }
+//             }).catch(err => {
+//                 console.log('Error getting documents', err);
+//                 registerLeavingDate(userId);
+//                 return getDefaultMessage(event);
+//             });
+//         }
+//     } else
+     if (userId == MN_LINE_ID) {
         if (shouldShowAkiyamadono()) {
             let url = DB_TMP_DOMAIN + AKIYAMA_DONO;
             return client.replyMessage(event.replyToken,

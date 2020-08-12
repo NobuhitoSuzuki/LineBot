@@ -34,6 +34,7 @@ const config = {
 
 var app = express();
 
+app.get('/', (req, res) => res.send('Hello LINE BOT!(GET)')); 
 app.post('/webhook', (req, res, next) => {
     Promise
         .all(req.body.events.map(handleEvent))

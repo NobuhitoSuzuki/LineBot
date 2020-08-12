@@ -6,7 +6,6 @@ const moment = require('moment-timezone');
 
 require('dotenv').config();
 
-const env = process.env
 
 const EVENT_TYPE_MESSAGE = "message";
 const EVEMT_TYPE_POSTBACK = "postback";
@@ -28,8 +27,8 @@ const MN_LINE_ID = process.env.MONCHI_LINE_ID;
 const PORT = process.env.PORT || 3000;
 
 const config = {
-    channelAccessToken: env.CHANNEL_ACCESS_TOKEN,
-    channelSecret: env.CHANNEL_SECRET
+    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+    channelSecret: process.env.CHANNEL_SECRET
 };
 
 var app = express();
